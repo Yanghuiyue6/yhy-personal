@@ -1,0 +1,1447 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YHY - 个人主页</title>
+    <meta name="description" content="YHY 个人作品集 - 展示设计、创作与成长历程的杂志风格个人主页，涵盖荣誉证书、作品展示与联系方式。">
+    <meta name="keywords" content="YHY,个人主页,作品集,portfolio,设计,创意,创意设计,个人网站">
+    <meta property="og:title" content="YHY - 个人主页">
+    <meta property="og:description" content="YHY 个人作品集 - 展示设计、创作与成长历程的杂志风格主页">
+    <meta property="og:type" content="website">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='4' fill='%23FF5546'/%3E%3Ctext x='16' y='24' text-anchor='middle' font-family='sans-serif' font-weight='900' font-size='22' fill='white'%3EY%3C/text%3E%3C/svg%3E">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        blackMain: '#000000',
+                        whiteMain: '#FFFFFF',
+                        grayMain: '#F7F8FA',
+                        redTheme: '#FF5546'
+                    },
+                    fontFamily: {
+                        magazine: ['Montserrat', 'sans-serif'],
+                        serif: ['Playfair Display', 'Georgia', 'serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .page-container { @apply w-full h-screen overflow-hidden relative; perspective: 2000px; }
+            .page { 
+                @apply absolute w-full h-full top-0 left-0; 
+                transform-style: preserve-3d;
+                backface-visibility: hidden; 
+            }
+            .page-active { z-index: 1; }
+            .cursor-dot { @apply fixed w-4 h-4 rounded-full bg-redTheme pointer-events-none z-[9999]; }
+        .cursor-trail-dot { position: fixed; border-radius: 50%; background: #FF5546; pointer-events: none; z-index: 9998; }
+            .writing-vertical { writing-mode: vertical-rl; text-orientation: mixed; }
+
+            /* 翻书 - 纸页容器 */
+            .flip-wrapper {
+                position: absolute;
+                top: 0; left: 0;
+                width: 100%; height: 100%;
+                transform-style: preserve-3d;
+                pointer-events: none;
+            }
+
+            /* 翻起的纸页（旧页面内容） */
+            .flip-page-sheet {
+                position: absolute;
+                top: 0; right: 0;
+                width: 100%; height: 100%;
+                transform-origin: right center;
+                transform-style: preserve-3d;
+                overflow: hidden;
+                backface-visibility: hidden;
+                will-change: transform, clip-path;
+            }
+
+            /* 翻书阴影层 */
+            .flip-shadow {
+                position: absolute;
+                top: 0; right: 0;
+                width: 100%; height: 100%;
+                transform-origin: right center;
+                transform-style: preserve-3d;
+                pointer-events: none;
+                backface-visibility: hidden;
+                will-change: transform, opacity;
+            }
+        }
+
+        /* ========== 真实翻书动画 - 纸张从右边缘向左翻开 ========== */
+        
+        /* 旧页面：从右边翻走 */
+        @keyframes pageFlipOut {
+            0% {
+                clip-path: inset(0% 0% 0% 0%);
+                transform: perspective(2000px) rotateY(0deg);
+                box-shadow: none;
+            }
+            15% {
+                clip-path: inset(0% 5% 0% 75%);
+                transform: perspective(2000px) rotateY(-25deg);
+                box-shadow: -8px 8px 30px rgba(0,0,0,0.15), inset -2px 0 20px rgba(0,0,0,0.06);
+            }
+            35% {
+                clip-path: inset(0% 12% 0% 52%);
+                transform: perspective(2000px) rotateY(-50deg);
+                box-shadow: -10px 10px 40px rgba(0,0,0,0.18), inset -3px 0 24px rgba(0,0,0,0.08);
+            }
+            60% {
+                clip-path: inset(0% 22% 0% 28%);
+                transform: perspective(2000px) rotateY(-72deg);
+                box-shadow: -14px 16px 50px rgba(0,0,0,0.22), inset -4px 0 28px rgba(0,0,0,0.1);
+            }
+            80% {
+                clip-path: inset(0% 38% 0% 12%);
+                transform: perspective(2000px) rotateY(-85deg);
+                box-shadow: -20px 22px 60px rgba(0,0,0,0.26), inset -5px 0 32px rgba(0,0,0,0.12);
+            }
+            95% {
+                clip-path: inset(0% 48% 0% 45%);
+                transform: perspective(2000px) rotateY(-94deg);
+                box-shadow: -30px 35px 70px rgba(0,0,0,0.32);
+                filter: brightness(0.85);
+            }
+            100% {
+                clip-path: inset(0% 50% 0% 50%);
+                transform: perspective(2000px) rotateY(-98deg);
+                box-shadow: -40px 45px 80px rgba(0,0,0,0.4);
+                opacity: 0;
+                filter: brightness(0.7);
+            }
+        }
+
+        /* 新页面：从左边翻入 */
+        @keyframes pageFlipIn {
+            0% {
+                clip-path: inset(0% 50% 0% 50%);
+                transform: perspective(2000px) rotateY(90deg) translateX(-80%);
+                opacity: 0;
+                filter: brightness(1.08);
+            }
+            10% {
+                clip-path: inset(0% 42% 0% 46%);
+                transform: perspective(2000px) rotateY(82deg) translateX(-65%);
+                opacity: 0.3;
+                filter: brightness(1.05);
+            }
+            30% {
+                clip-path: inset(0% 28% 0% 34%);
+                transform: perspective(2000px) rotateY(62deg) translateX(-44%);
+                opacity: 0.65;
+                filter: brightness(1.03);
+            }
+            55% {
+                clip-path: inset(0% 14% 0% 18%);
+                transform: perspective(2000px) rotateY(33deg) translateX(-20%);
+                opacity: 0.88;
+                filter: brightness(1.01);
+            }
+            78% {
+                clip-path: inset(0% 5% 0% 6%);
+                transform: perspective(2000px) rotateY(11deg) translateX(-5%);
+                opacity: 0.97;
+                filter: brightness(1);
+            }
+            92% {
+                clip-path: inset(0% 1% 0% 1%);
+                transform: perspective(2000px) rotateY(2deg) translateX(-0.5%);
+                opacity: 1;
+            }
+            100% {
+                clip-path: inset(0% 0% 0% 0%);
+                transform: perspective(2000px) rotateY(0deg) translateX(0);
+                opacity: 1;
+                filter: brightness(1);
+            }
+        }
+
+        .animate-page-out { animation: pageFlipOut 0.95s cubic-bezier(0.22, 0.61, 0.36, 1) forwards; }
+        .animate-page-in { animation: pageFlipIn 0.95s cubic-bezier(0.22, 0.61, 0.36, 1) forwards; }
+
+        /* 内容动画保持不变 */
+        @keyframes fadeUp {
+            from { transform: translateY(40px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .animate-fade-up { animation: fadeUp 1.0s ease-out forwards; }
+
+        /* 图片慢慢浮入效果 — 使用 transition 确保丝滑 */
+        .contact-img-hidden {
+            opacity: 0;
+            filter: blur(6px) brightness(0.55);
+            transform: scale(1.04);
+            transition: opacity 1.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                        filter 1.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+                        transform 1.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            will-change: opacity, filter, transform;
+            backface-visibility: hidden;
+        }
+        .contact-img-visible {
+            opacity: 1;
+            filter: blur(0) brightness(1);
+            transform: scale(1);
+        }
+
+        /* 图片从下到上浮现 */
+        @keyframes imageRiseUp {
+            0%   { transform: translateY(100vh); opacity: 0; filter: blur(4px) brightness(0.3); }
+            50%  { transform: translateY(15vh); opacity: 0.6; filter: blur(0.5px) brightness(0.85); }
+            100% { transform: translateY(0); opacity: 1; filter: blur(0) brightness(1); }
+        }
+        .animate-image-rise { animation: imageRiseUp 1.9s cubic-bezier(0.22, 0.61, 0.36, 1) forwards; }
+
+        @keyframes floatIn {
+            from { transform: translateX(30px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .animate-float-in { animation: floatIn 0.85s ease-out forwards; }
+
+        @keyframes textFloat {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-text-float { animation: textFloat 0.7s ease-out forwards; }
+
+        /* 荣誉证书页面 - 右侧撕拉片飞入 */
+        @keyframes flyInRight {
+            from { transform: translateX(120%) rotate(0deg); opacity: 0; }
+            to { transform: translateX(0) rotate(var(--rot)); opacity: 1; }
+        }
+        .animate-fly-in { 
+            animation: flyInRight 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+            opacity: 0;
+        }
+
+        /* 画廊画框玻璃反光效果 */
+        .gallery-frame-inner {
+            position: relative;
+        }
+        .gallery-frame-inner::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 35%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.12), transparent);
+            pointer-events: none;
+            transition: opacity 0.6s ease;
+        }
+        .dark-frame .gallery-frame-inner::after {
+            background: linear-gradient(to bottom, rgba(255,255,255,0.06), transparent);
+        }
+        .gallery-item:hover .gallery-frame-inner::after {
+            opacity: 0;
+        }
+
+        @keyframes certFly {
+            from { transform: translateY(60px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .animate-cert-fly { animation: certFly 1.25s ease-out forwards; }
+
+        /* ══════ 导航栏 — 透明浮动，不遮挡内容 ══════ */
+        .nav-main {
+            background: transparent;
+            pointer-events: none;
+        }
+        .nav-main > * { pointer-events: auto; }
+
+        /* 深色页：白色文字 + 微阴影增强可读性 */
+        .nav-brand-text { color: #FFFFFF; text-shadow: 0 1px 3px rgba(0,0,0,0.3); }
+        .nav-brand-divider { background: rgba(255,255,255,0.3); }
+        .nav-brand-sub { color: rgba(255,255,255,0.55); text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
+
+        /* 浅色页：深色文字 */
+        .nav-main.light-bg .nav-brand-text { color: #111111; text-shadow: none; }
+        .nav-main.light-bg .nav-brand-divider { background: rgba(0,0,0,0.15); }
+        .nav-main.light-bg .nav-brand-sub { color: rgba(0,0,0,0.45); text-shadow: none; }
+
+        /* 导航链接 */
+        .nav-link {
+            position: relative;
+            padding-bottom: 6px;
+            color: #FFFFFF;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.35);
+        }
+        .nav-main.light-bg .nav-link {
+            color: #111111;
+            text-shadow: none;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%) scaleX(0);
+            width: 100%;
+            height: 2px;
+            background: #FF5546;
+            border-radius: 1px;
+            transition: transform 0.3s ease;
+        }
+        .nav-link:hover::after {
+            transform: translateX(-50%) scaleX(1);
+        }
+        .nav-link.active {
+            color: #FF5546 !important;
+            text-shadow: none;
+        }
+        .nav-link.active::after {
+            transform: translateX(-50%) scaleX(1);
+        }
+
+        /* 下拉菜单 */
+        .nav-dropdown-menu {
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: 10px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15), 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .nav-main.light-bg .nav-dropdown-menu {
+            border: 1px solid rgba(0,0,0,0.08);
+        }
+        .nav-dropdown-menu.open {
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: translateY(0) !important;
+            pointer-events: auto !important;
+        }
+        .nav-dropdown-arrow.open {
+            transform: rotate(180deg);
+        }
+
+        .sub-nav-item {
+            border-radius: 6px;
+            margin: 2px 6px;
+        }
+        .sub-nav-item.active {
+            color: #FF5546 !important;
+            background: rgba(255,85,70,0.06);
+            font-weight: 600;
+        }
+
+        /* 拼图散开过渡 */
+        .puzzle-piece {
+            position: absolute;
+            overflow: hidden;
+            background: inherit;
+            will-change: transform, opacity;
+        }
+        .puzzle-piece > .puzzle-inner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            transform-origin: 0 0;
+        }
+
+        @keyframes puzzleScatterOut {
+            0%   { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; }
+            100% { transform: translate(var(--px), var(--py)) scale(0.7) rotate(var(--r)); opacity: 0; }
+        }
+        @keyframes puzzleFlyIn {
+            0%   { transform: translate(var(--px), var(--py)) scale(0.7) rotate(var(--r)); opacity: 0; }
+            100% { transform: translate(0, 0) scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        /* 杂志统一图片色调 — 微暖、微对比、低饱和 */
+        .img-magazine {
+            filter: sepia(5%) contrast(1.04) brightness(0.96) saturate(0.92);
+        }
+    </style>
+</head>
+<body class="font-magazine m-0 p-0 overflow-hidden">
+    <!-- 全局鼠标红色拖影 -->
+    <div class="cursor-dot"></div>
+
+    <!-- 导航栏 — 透明浮动，不遮挡内容 -->
+    <nav class="fixed top-0 left-0 w-full z-[998] flex items-center justify-between px-12 py-5 nav-main">
+        
+        <!-- 左侧：品牌 Logo -->
+        <div class="flex items-center gap-3 select-none pointer-events-none">
+            <div class="w-[10px] h-[10px] bg-redTheme rotate-45 shadow-[0_0_12px_rgba(255,85,70,0.5)]"></div>
+            <span class="text-[16px] font-black tracking-[0.12em] nav-brand-text">YHY</span>
+            <div class="w-[1px] h-4 nav-brand-divider"></div>
+            <span class="text-[9px] tracking-[0.28em] uppercase font-semibold nav-brand-sub">Portfolio</span>
+        </div>
+
+        <!-- 右侧：导航菜单 -->
+        <div class="flex items-center gap-10">
+            <span class="nav-item nav-link cursor-pointer text-[15px] font-bold tracking-[0.04em] transition-colors duration-300 hover:text-redTheme" data-index="0">Home</span>
+            
+            <!-- About — 带下拉 -->
+            <div class="relative nav-dropdown-group">
+                <span class="nav-item nav-link cursor-pointer text-[15px] font-bold tracking-[0.04em] transition-colors duration-300 hover:text-redTheme flex items-center gap-1.5" data-index="1">
+                    About
+                    <svg class="w-3 h-3 transition-transform duration-300 nav-dropdown-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                </span>
+                <div class="nav-dropdown-menu absolute top-full right-0 mt-3 bg-white py-2.5 min-w-[170px] opacity-0 invisible translate-y-1.5 transition-all duration-300 pointer-events-none">
+                    <span class="sub-nav-item block cursor-pointer text-blackMain/75 text-[13px] font-semibold px-5 py-3 transition-all duration-200 hover:text-redTheme hover:bg-blackMain/[0.04]" data-sub="0">基本信息</span>
+                    <span class="sub-nav-item block cursor-pointer text-blackMain/75 text-[13px] font-semibold px-5 py-3 transition-all duration-200 hover:text-redTheme hover:bg-blackMain/[0.04]" data-sub="1">教育技能</span>
+                    <span class="sub-nav-item block cursor-pointer text-blackMain/75 text-[13px] font-semibold px-5 py-3 transition-all duration-200 hover:text-redTheme hover:bg-blackMain/[0.04]" data-sub="2">实践经历</span>
+                </div>
+            </div>
+
+            <span class="nav-item nav-link cursor-pointer text-[15px] font-bold tracking-[0.04em] transition-colors duration-300 hover:text-redTheme" data-index="2">Honors</span>
+            <span class="nav-item nav-link cursor-pointer text-[15px] font-bold tracking-[0.04em] transition-colors duration-300 hover:text-redTheme" data-index="3">Contact</span>
+        </div>
+    </nav>
+
+    <div class="page-container">
+        <!-- 板块1：首页 -->
+        <div class="page page-0 page-active bg-blackMain flex items-center justify-center relative">
+            <img src="389bf4f4be2081b188914ffdd71461ea.jpg" alt="个人封面" class="w-full h-full object-contain animate-image-rise img-magazine">
+            <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-10" style="padding: 2vh 2vw; gap: 0;">
+                <span class="text-redTheme font-black tracking-[0.12em] animate-text-float drop-shadow-[0_6px_20px_rgba(0,0,0,0.9)] leading-none" style="font-size: 7vw; animation-delay: 1.2s; opacity: 0;">THE</span>
+                <span class="text-redTheme font-black tracking-[0.12em] animate-text-float drop-shadow-[0_6px_20px_rgba(0,0,0,0.9)] leading-none" style="font-size: 7vw; animation-delay: 1.45s; opacity: 0;">ESSENCE</span>
+                <span class="text-redTheme font-black tracking-[0.12em] animate-text-float drop-shadow-[0_6px_20px_rgba(0,0,0,0.9)] leading-none" style="font-size: 7vw; animation-delay: 1.7s; opacity: 0;">OF</span>
+                <span class="text-redTheme font-black tracking-[0.04em] animate-text-float leading-none" style="font-size: 16vw; animation-delay: 1.95s; opacity: 0; text-shadow: 0 6px 30px rgba(0,0,0,0.95), 0 0 100px rgba(255,85,70,0.45);">Y</span>
+                <span class="text-redTheme font-black tracking-[0.12em] animate-text-float drop-shadow-[0_6px_20px_rgba(0,0,0,0.9)] leading-none" style="font-size: 7vw; animation-delay: 2.2s; opacity: 0;">CREATION</span>
+                <span class="text-whiteMain/25 italic animate-text-float tracking-[0.08em] mt-2" style="font-size: 1.2vw; animation-delay: 2.45s; opacity: 0; font-family: 'Playfair Display', serif;">A personal portfolio · 2024—2026</span>
+            </div>
+        </div>
+
+        <!-- 板块2：关于我 -->
+        <div class="page page-1 bg-grayMain">
+            <!-- 子页1：基本信息 - 参考图片左右分屏风格 -->
+            <div class="w-full h-full flex overflow-hidden basic-info-page">
+                <!-- 左侧：大图 + 超大文字叠加，参考图片左侧风格 -->
+                <div class="w-[48%] h-full relative bg-neutral-200 overflow-hidden">
+                    <img src="1da152214a06b8f29c7901f7fcfc1cbc.jpg" alt="关于我" class="w-full h-full object-contain grayscale hover:grayscale-0 transition-all duration-700 img-magazine">
+                    <!-- 左下角章节编号 + 标题 -->
+                    <div class="absolute bottom-6 left-8 z-20">
+                        <div class="flex items-baseline gap-3">
+                            <span class="text-5xl font-bold text-white drop-shadow-lg">01</span>
+                            <span class="text-2xl font-bold text-white tracking-wide drop-shadow-lg">About Me</span>
+                        </div>
+                    </div>
+                    <!-- 左侧超大文字叠加 -->
+                    <div class="absolute inset-0 flex items-center z-10 pointer-events-none">
+                        <span class="text-whiteMain text-[7vw] font-black leading-none tracking-tight ml-8 drop-shadow-[0_4px_30px_rgba(0,0,0,0.7)]">YANG<br>HUIYUE</span>
+                    </div>
+                </div>
+
+                <!-- 右侧：深色背景 + 信息数据 + 装饰大字，参考图片右侧风格 -->
+                <div class="w-[52%] h-full bg-stone-900 relative flex flex-col justify-between py-12 pl-14 pr-10 text-whiteMain">
+                    <!-- 顶部导航标签 -->
+                    <div class="flex gap-8 text-[10px] tracking-widest uppercase opacity-40">
+                        <span>About</span>
+                        <span>Profile</span>
+                        <span>Info</span>
+                    </div>
+
+                    <!-- 中部信息区域 -->
+                    <div class="flex-1 flex flex-col justify-center space-y-8 mt-4">
+                        <!-- 右上角装饰性大字 -->
+                        <div class="absolute top-[12%] right-6 right-0 pr-10 z-0">
+                            <span class="text-whiteMain/[0.07] text-[8vw] font-black leading-none select-none whitespace-nowrap">YHY</span>
+                        </div>
+                        
+                        <!-- 基本信息列表 - 参考图片中间的数据列表样式 -->
+                        <div class="relative z-10 grid grid-cols-2 gap-x-10 gap-y-5 text-sm max-w-md">
+                            <div class="flex flex-col">
+                                <span class="text-[10px] tracking-widest uppercase opacity-50 mb-1">Name / 姓名</span>
+                                <span class="font-semibold text-base">杨惠月</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-[10px] tracking-widest uppercase opacity-50 mb-1">DOB / 出生日期</span>
+                                <span class="font-semibold text-base">2005.11.19</span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-[10px] tracking-widest uppercase opacity-50 mb-1">Tel / 联系电话</span>
+                                <span class="font-semibold text-base">15888511679 <span class="text-[11px] opacity-50 font-normal">（微信同号）</span></span>
+                            </div>
+                            <div class="flex flex-col">
+                                <span class="text-[10px] tracking-widest uppercase opacity-50 mb-1">Email / 邮箱</span>
+                                <span class="font-semibold text-base">207357972@qq.com</span>
+                            </div>
+                            <div class="flex flex-col col-span-2">
+                                <span class="text-[10px] tracking-widest uppercase opacity-50 mb-1">Location / 居住地址</span>
+                                <span class="font-semibold text-base">浙江省宁波市</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 底部：大号装饰文字 -->
+                    <div class="relative z-10 pb-4">
+                        <span class="text-whiteMain text-[3vw] font-black tracking-tight leading-none block">BUILDING MY<br>OWN ERA</span>
+                        <span class="text-whiteMain/60 text-base tracking-wider mt-2 inline-block" style="font-family: 'Playfair Display', serif; font-style: italic;">100% Authentic</span>
+                    </div>
+
+                    <!-- 右侧竖排文字装饰（参考图片最右侧竖条） -->
+                    <div class="absolute right-2 top-1/2 -translate-y-1/2 writing-vertical text-[9px] tracking-widest uppercase opacity-30 rotate-180" style="writing-mode: vertical-rl;">
+                        The Essence Of Y Creation
+                    </div>
+                </div>
+            </div>
+
+            <!-- 子页2：教育/技能/自我评价 -->
+            <div class="w-full h-full bg-whiteMain hidden practice-page overflow-hidden">
+                <div class="w-full h-full flex">
+                    <!-- 左侧：文字内容区 -->
+                    <div class="w-[45%] h-full flex flex-col justify-center pl-16 pr-8 py-8 text-blackMain text-sm leading-snug">
+                        <h3 class="text-[10px] font-bold tracking-widest mb-1 uppercase opacity-60">Education</h3>
+                        <h2 class="text-lg font-bold mb-1">教育经历</h2>
+                        <p class="mb-3 font-medium text-sm">2024.9 — 2027.6　上海浦东职业技术学院</p>
+                        <p class="mb-6 font-bold text-base">专业排名第 2，2024-2025学年第一学期获校二等奖学金、第二学期获校三等奖学金。</p>
+
+                        <h3 class="text-[10px] font-bold tracking-widest mb-1 uppercase opacity-60">Core Courses</h3>
+                        <h2 class="text-lg font-bold mb-1">主修课程</h2>
+                        <p class="mb-6 leading-snug opacity-80 text-sm">短视频制作与运营、视频剪辑技术、AIGC技术应用、虚拟技术应用、新媒体文案策划与写作、摄影摄像技术、数字合成技术、互联网信息审核与舆情分析、直播技术、H5融媒体动画制作技术、达芬奇调色技术、新媒体技术应用、视觉设计、计算机应用基础、web前端设计制作。</p>
+
+                        <h3 class="text-[10px] font-bold tracking-widest mb-1 uppercase opacity-60">Core Skills</h3>
+                        <h2 class="text-lg font-bold mb-1">核心技能</h2>
+                        <p class="leading-snug opacity-80 text-sm">
+                            <span class="font-semibold">AIGC 短剧创作：</span>豆包、DeepSeek、即梦、有言，AI 脚本生成 / 剧情优化 / 人设设计 / 台词撰写<br>
+                            <span class="font-semibold">视频全流程：</span>PR、AE、剪映、Animate、摄影摄像、短剧拍摄与剪辑<br>
+                            <span class="font-semibold">视觉设计：</span>PS、AI、Canva、Axure、H5 制作、封面 / 海报 / 分镜制作<br>
+                            <span class="font-semibold">数据运营：</span>Fine BI 初级认证，抖音 / 小红书数据分析、爆款规律提炼<br>
+                            <span class="font-semibold">基础能力：</span>英语六级、普通话二级甲等、计算机一级、C1 驾照
+                        </p>
+                    </div>
+                    <!-- 右侧：图文混排区 — 杂志编辑式错位叠加布局（参考图风格） -->
+                    <div class="w-[55%] h-full relative bg-[#f5f2ed] overflow-hidden flex items-center p-0">
+                        
+                        <!-- ===== 上部：红色大色块 + 超大字母装饰 ===== -->
+                        <!-- 红色矩形色块（右下角） -->
+                        <div class="absolute bottom-0 right-[10%] w-[48%] h-[34%] bg-redTheme pointer-events-none"></div>
+                        <!-- 红色色块上的超大字母 -->
+                        <span class="absolute bottom-[2%] right-[10%] text-[8.5vw] font-black text-white/[0.13] select-none leading-[0.75] pointer-events-none" style="font-family: 'Georgia', 'Times New Roman', serif;">YHY</span>
+                        
+                        <!-- ===== 图片组：错位叠加布局 ===== -->
+                        <!-- 图片1 — 竖版大图，偏左上，带白色边框 -->
+                        <div class="absolute top-[6%] left-[4%] w-[44%] h-[58%] group cursor-pointer z-20 transition-all duration-700 ease-out hover:z-40 hover:scale-[1.03]" style="transform: rotate(-1.5deg);">
+                            <div class="w-full h-full bg-white p-[8px] shadow-[4px_8px_24px_rgba(0,0,0,0.18)] transition-all duration-700 group-hover:shadow-[8px_16px_36px_rgba(0,0,0,0.28)] group-hover:rotate-0">
+                                <div class="w-full h-full overflow-hidden">
+                                    <img src="3d1c44ac65dfbb137a273319a7b26d52.jpg" alt="作品展示" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 ease-out group-hover:scale-[1.06] group-hover:brightness-105">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 图片2 — 横版，偏右下，与图片1部分重叠 -->
+                        <div class="absolute top-[36%] left-[28%] w-[50%] h-[44%] group cursor-pointer z-30 transition-all duration-700 ease-out hover:z-40 hover:scale-[1.03]" style="transform: rotate(2.2deg);">
+                            <div class="w-full h-full bg-white p-[8px] shadow-[4px_8px_24px_rgba(0,0,0,0.18)] transition-all duration-700 group-hover:shadow-[8px_16px_36px_rgba(0,0,0,0.28)] group-hover:rotate-0">
+                                <div class="w-full h-full overflow-hidden">
+                                    <img src="ba0c3d4f241b1b88ec988d4706f4b5d4.jpg" alt="作品展示" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 ease-out group-hover:scale-[1.06] group-hover:brightness-105">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ===== 装饰元素 ===== -->
+                        <!-- 左侧竖条装饰 -->
+                        <div class="absolute left-8 top-1/2 -translate-y-1/2 flex flex-col items-center gap-6 pointer-events-none z-10">
+                            <div class="w-[1px] h-10 bg-blackMain/[0.08]"></div>
+                            <div class="w-[1px] h-16 bg-redTheme/25"></div>
+                            <div class="w-[1px] h-10 bg-blackMain/[0.08]"></div>
+                        </div>
+
+                        <!-- 右下角小装饰标签 -->
+                        <div class="absolute bottom-6 right-10 flex items-center gap-3 pointer-events-none z-10">
+                            <span class="text-[7px] text-blackMain/20 tracking-[0.3em] uppercase">Portfolio</span>
+                            <div class="w-[3px] h-[3px] bg-redTheme/40 rotate-45"></div>
+                            <div class="w-8 h-[0.5px] bg-blackMain/[0.1]"></div>
+                        </div>
+
+                        <!-- 超大背景水印字母 — 移到右下角 -->
+                        <span class="absolute right-0 bottom-0 text-[12vw] font-black text-blackMain/[0.018] select-none leading-[0.7] pointer-events-none translate-x-[5%] translate-y-[8%]" style="font-family: 'Georgia', 'Times New Roman', serif;">Y</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 子页3：实践经历 — 拼图拼贴风格 --><div class="w-full h-full bg-whiteMain hidden practice-detail-page overflow-hidden">
+                <div class="w-full h-full flex">
+                    <!-- 左侧：文字内容区 — 字体与教育技能页统一 -->
+                    <div class="w-[45%] h-full flex flex-col justify-center pl-16 pr-8 py-8 text-blackMain text-sm leading-snug">
+                        <h3 class="text-[10px] font-bold tracking-widest mb-1 uppercase opacity-60">Experience</h3>
+                        <h2 class="text-lg font-bold mb-1">实践经历</h2>
+                        
+                        <div class="space-y-6 mt-5">
+                            <div>
+                                <h4 class="font-bold text-base mb-1">中共四大研学拍摄</h4>
+                                <p class="opacity-80 leading-snug text-sm">参与中共四大研学宣传片制作，负责全流程照片拍摄与视频录制，保障素材质量、素材贴合主题。</p>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-base mb-1">人物文案与人设塑造</h4>
+                                <p class="opacity-80 leading-snug text-sm">独立完成明星宣传文案、红稿创作，精准贴合人设与传播需求，单篇斩获2822阅读、260互动数据。</p>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-base mb-1">短视频全流程</h4>
+                                <p class="opacity-80 leading-snug text-sm">主导小组 VLOG项目，统筹脚本策划、拍摄指导到后期粗剪辑的全链路执行，保障成片输出与质量。</p>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-base mb-1">视觉物料制作</h4>
+                                <p class="opacity-80 leading-snug text-sm">参与广告公司 KT 板设计、喷绘物料优化，负责排版、视觉落地收尾工作，高效完成物料迭代工作。</p>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-base mb-1">平台数据复盘</h4>
+                                <p class="opacity-80 leading-snug text-sm">统筹小组进行抖音、小红书、微博用户画像与内容偏好分析，形成完整报告并提出相关优化建议。</p>
+                            </div>
+                        </div>
+
+                        <!-- 底部装饰标签 -->
+                        <div class="mt-10 flex items-center gap-3 text-[8px] tracking-[0.2em] uppercase text-blackMain/20">
+                            <div class="w-4 h-[0.5px] bg-blackMain/15"></div>
+                            <span>Practice & Project</span>
+                        </div>
+                    </div>
+
+                    <!-- 右侧：照片区 — 瀑布流不规则网格布局（参考图风格） -->
+                    <div class="w-[55%] h-full bg-[#f5f2ed] relative overflow-hidden p-8">
+                        
+                        <!-- 超大背景水印字母 -->
+                        <span class="absolute right-0 bottom-0 text-[14vw] font-black text-blackMain/[0.018] select-none leading-[0.65] pointer-events-none translate-x-[4%] translate-y-[6%]" style="font-family: 'Georgia', 'Times New Roman', serif;">P</span>
+
+                        <!-- ===== 瀑布流不规则网格 ===== -->
+                        <!-- 第一行：横版大图（占2/3宽） + 竖版小图（占1/3宽） -->
+                        <div class="relative w-full h-full flex flex-col gap-4">
+                            
+                            <!-- 第一行 -->
+                            <div class="flex gap-4" style="height: 38%;">
+                                <!-- 横版大图 — 占宽约62% -->
+                                <div class="w-[62%] h-full group cursor-pointer relative transition-all duration-600 ease-out hover:z-50 hover:scale-[1.025]" style="transform: rotate(-0.6deg);">
+                                    <div class="w-full h-full bg-white p-[6px] shadow-[3px_5px_18px_rgba(0,0,0,0.12)] transition-all duration-600 group-hover:shadow-[6px_12px_30px_rgba(0,0,0,0.2)] group-hover:rotate-0">
+                                        <div class="w-full h-full overflow-hidden relative">
+                                            <img src="2567f1e835346487ea551318ec2903ce.jpg" alt="创作作品" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 ease-out group-hover:scale-[1.06] group-hover:brightness-105">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 竖版小图 — 占宽约34% -->
+                                <div class="w-[34%] h-full group cursor-pointer relative transition-all duration-600 ease-out hover:z-50 hover:scale-[1.025]" style="transform: rotate(1.2deg);">
+                                    <div class="w-full h-full bg-white p-[6px] shadow-[3px_5px_18px_rgba(0,0,0,0.12)] transition-all duration-600 group-hover:shadow-[6px_12px_30px_rgba(0,0,0,0.2)] group-hover:rotate-0">
+                                        <div class="w-full h-full overflow-hidden relative">
+                                            <img src="4577e9f4871c1d36b8aecea5604a5779.jpg" alt="创作作品" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 ease-out group-hover:scale-[1.06] group-hover:brightness-105">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 第二行 -->
+                            <div class="flex gap-4" style="height: 36%;">
+                                <!-- 竖版小图 — 占宽约28% -->
+                                <div class="w-[28%] h-full group cursor-pointer relative transition-all duration-600 ease-out hover:z-50 hover:scale-[1.025]" style="transform: rotate(0.8deg); margin-top: -6px;">
+                                    <div class="w-full h-full bg-white p-[6px] shadow-[3px_5px_18px_rgba(0,0,0,0.12)] transition-all duration-600 group-hover:shadow-[6px_12px_30px_rgba(0,0,0,0.2)] group-hover:rotate-0">
+                                        <div class="w-full h-full overflow-hidden relative">
+                                            <img src="0b0e3a87b7501608b4d13db1738cc8f6.jpg" alt="创作作品" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 ease-out group-hover:scale-[1.06] group-hover:brightness-105">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 横版大图 — 占宽约50% -->
+                                <div class="w-[50%] h-full group cursor-pointer relative transition-all duration-600 ease-out hover:z-50 hover:scale-[1.025]" style="transform: rotate(-1.0deg);">
+                                    <div class="w-full h-full bg-white p-[6px] shadow-[3px_5px_18px_rgba(0,0,0,0.12)] transition-all duration-600 group-hover:shadow-[6px_12px_30px_rgba(0,0,0,0.2)] group-hover:rotate-0">
+                                        <div class="w-full h-full overflow-hidden relative">
+                                            <img src="27380cf67e7a7f355ef6e8df34bd859d.jpg" alt="创作作品" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 ease-out group-hover:scale-[1.06] group-hover:brightness-105">
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 竖版小图 — 占宽约18% -->
+                                <div class="w-[18%] h-full group cursor-pointer relative transition-all duration-600 ease-out hover:z-50 hover:scale-[1.025]" style="transform: rotate(1.5deg); margin-top: 4px;">
+                                    <div class="w-full h-full bg-white p-[6px] shadow-[3px_5px_18px_rgba(0,0,0,0.12)] transition-all duration-600 group-hover:shadow-[6px_12px_30px_rgba(0,0,0,0.2)] group-hover:rotate-0">
+                                        <div class="w-full h-full overflow-hidden relative">
+                                            <img src="260b114c373aa04fedc0e8cf65193c58.jpg" alt="创作作品" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 ease-out group-hover:scale-[1.06] group-hover:brightness-105">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 第三行 -->
+                            <div class="flex gap-4" style="height: 20%;">
+                            <!-- 横版小图 — 占宽约40% -->
+                            <div class="w-[40%] h-full group cursor-pointer relative transition-all duration-600 ease-out hover:z-50 hover:scale-[1.025]" style="transform: rotate(-0.5deg); margin-top: -4px;">
+                                <div class="w-full h-full bg-white p-[6px] shadow-[3px_5px_18px_rgba(0,0,0,0.12)] transition-all duration-600 group-hover:shadow-[6px_12px_30px_rgba(0,0,0,0.2)] group-hover:rotate-0">
+                                    <div class="w-full h-full overflow-hidden relative">
+                                        <img src="547d07004e282615f39b06119ca76ea6.jpg" alt="创作作品" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 ease-out group-hover:scale-[1.06] group-hover:brightness-105">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 横版小图 — 占宽约40% -->
+                            <div class="w-[40%] h-full group cursor-pointer relative transition-all duration-600 ease-out hover:z-50 hover:scale-[1.025]" style="transform: rotate(0.9deg); margin-top: 6px;">
+                                <div class="w-full h-full bg-white p-[6px] shadow-[3px_5px_18px_rgba(0,0,0,0.12)] transition-all duration-600 group-hover:shadow-[6px_12px_30px_rgba(0,0,0,0.2)] group-hover:rotate-0">
+                                    <div class="w-full h-full overflow-hidden relative">
+                                        <img src="fc010fb21b14e25e7fefdaa6cd6ce4df.jpg" alt="创作作品" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-700 ease-out group-hover:scale-[1.06] group-hover:brightness-105">
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+
+                        <!-- 右上角章节标签 -->
+                        <div class="absolute top-5 right-6 z-20 flex items-center gap-2 pointer-events-none">
+                            <div class="w-3 h-[0.5px] bg-redTheme/30"></div>
+                            <span class="text-redTheme/25 text-[8px] tracking-[0.3em] uppercase">Creative Practice</span>
+                        </div>
+
+                        <!-- 底部英文引用 -->
+                        <div class="absolute bottom-6 left-8 right-8 z-20 flex items-center justify-center gap-4 pointer-events-none">
+                            <div class="w-6 h-[0.5px] bg-blackMain/[0.07]"></div>
+                            <p class="text-blackMain/[0.18] text-[8px] italic tracking-[0.08em]" style="font-family: 'Playfair Display', serif;">Every project is a story told through creative vision</p>
+                            <div class="w-6 h-[0.5px] bg-blackMain/[0.07]"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 板块3：荣誉证书 -->
+        <div class="page page-2 bg-whiteMain overflow-hidden">
+            <!-- 顶部导航条 -->
+            <div class="w-full px-10 pt-5 flex gap-8 text-[10px] tracking-widest uppercase opacity-50 text-blackMain">
+                <span>Certificates</span>
+                <span>Honors</span>
+                <span>Awards</span>
+            </div>
+
+            <div class="w-full h-full flex pt-4">
+                <!-- 左侧：文字内容区 - 渐显入场 -->
+                <div class="w-[48%] h-full pl-14 pr-6 py-10 text-blackMain flex flex-col justify-start">
+                    <h2 class="text-xs font-bold tracking-widest mb-4 opacity-60 uppercase animate-text-float" style="animation-delay: 0.25s; opacity: 0;">Certificates & Honors</h2>
+                    
+                    <div class="grid grid-cols-2 gap-x-8 gap-y-6 mt-4 text-base font-semibold leading-loose">
+                        <div class="animate-text-float" style="animation-delay: 0.42s; opacity: 0;"><span>大学英语六级证书（466）</span></div>
+                        <div class="animate-text-float" style="animation-delay: 0.55s; opacity: 0;"><span>大学英语四级证书（500）</span></div>
+                        <div class="animate-text-float" style="animation-delay: 0.68s; opacity: 0;"><span>普通话国家二级甲等证书</span></div>
+                        <div class="animate-text-float" style="animation-delay: 0.8s; opacity: 0;"><span>全国计算机考试一级证书</span></div>
+                        <div class="animate-text-float" style="animation-delay: 0.92s; opacity: 0;"><span>上海市计算机一级证书</span></div>
+                        <div class="animate-text-float" style="animation-delay: 1.05s; opacity: 0;"><span>中共四大研学证书</span></div>
+                        <div class="animate-text-float" style="animation-delay: 1.18s; opacity: 0;"><span>达芬奇初级证书</span></div>
+                        <div class="animate-text-float" style="animation-delay: 1.3s; opacity: 0;"><span>Fine BI 初级证书</span></div>
+                        <div class="animate-text-float" style="animation-delay: 1.45s; opacity: 0;"><span>C1 驾驶证</span></div>
+                    </div>
+
+                    <!-- 底部大标题 -->
+                    <div class="mt-auto pb-8 animate-text-float" style="animation-delay: 1.7s; opacity: 0;">
+                        <div class="flex items-baseline gap-4">
+                            <span class="text-4xl font-bold text-blackMain/80">03</span>
+                            <span class="text-3xl font-bold text-blackMain tracking-tight">Honors & Certificates</span>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- 右侧：策展级画廊照片墙 -->
+                <div class="w-[52%] h-full bg-[#1c1917] relative overflow-hidden flex items-center justify-center">
+                    <!-- 墙面肌理 -->
+                    <div class="absolute inset-0 opacity-[0.015] bg-[radial-gradient(circle_at_20%_30%,_#d4a853_1px,transparent_1px)] bg-[length:40px_40px] pointer-events-none"></div>
+                    
+                    <!-- 三束主聚光灯 -->
+                    <div class="absolute pointer-events-none">
+                        <div class="absolute w-[300px] h-[200px] rounded-full bg-amber-400/[0.06] blur-[80px]" style="top: -5%; left: 15%;"></div>
+                        <div class="absolute w-[250px] h-[180px] rounded-full bg-amber-300/[0.05] blur-[70px]" style="top: 30%; right: -5%;"></div>
+                        <div class="absolute w-[280px] h-[160px] rounded-full bg-amber-500/[0.04] blur-[75px]" style="bottom: -5%; left: 20%;"></div>
+                    </div>
+
+                    <!-- 顶部金属铭牌 -->
+                    <div class="absolute top-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-6 pointer-events-none">
+                        <div class="w-8 h-[0.5px] bg-amber-400/30"></div>
+                        <span class="text-amber-300/50 text-[9px] tracking-[0.25em] uppercase font-medium">Gallery Wall</span>
+                        <div class="w-8 h-[0.5px] bg-amber-400/30"></div>
+                    </div>
+
+                    <!-- 底部装饰线 -->
+                    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-4 pointer-events-none">
+                        <div class="w-12 h-[0.5px] bg-white/10"></div>
+                        <div class="w-1 h-1 bg-amber-400/25 rotate-45"></div>
+                        <div class="w-12 h-[0.5px] bg-white/10"></div>
+                    </div>
+
+                    <!-- 左侧竖线装饰 -->
+                    <div class="absolute left-5 top-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-4 pointer-events-none">
+                        <div class="w-[0.5px] h-10 bg-amber-400/15"></div>
+                        <div class="w-[0.5px] h-16 bg-white/8"></div>
+                        <div class="w-[0.5px] h-10 bg-amber-400/15"></div>
+                    </div>
+
+                    <!-- 右侧竖线装饰 -->
+                    <div class="absolute right-5 top-1/2 -translate-y-1/2 z-20 flex flex-col items-center gap-4 pointer-events-none">
+                        <div class="w-[0.5px] h-10 bg-amber-400/15"></div>
+                        <div class="w-[0.5px] h-16 bg-white/8"></div>
+                        <div class="w-[0.5px] h-10 bg-amber-400/15"></div>
+                    </div>
+
+                    <!-- 3行2列画廊：6张证书/作品（杂志内页版式） -->
+                    <div class="relative z-10 w-full h-full flex flex-col items-center justify-center gap-y-[20px] px-6">
+
+                        <!-- ══════════ Row1 — 竖版行：啦啦操 + 非遗绒花 ══════════ -->
+                        <div class="flex gap-x-4">
+                            <!-- Col1 — 白框 | 竖版 | 啦啦操 -->
+                            <div class="animate-fly-in gallery-item flex justify-center items-center" style="animation-delay: 0.08s; --rot: rotate(-0.6deg);">
+                                <div class="bg-[#f7f3ed] shadow-[0_4px_20px_rgba(0,0,0,0.48)] p-[6px] relative group cursor-pointer transition-all duration-[600ms] hover:scale-[1.22] hover:z-50 hover:shadow-[0_14px_48px_rgba(0,0,0,0.72),0_0_26px_rgba(212,168,83,0.12)] hover:rotate-0">
+                                    <div class="absolute inset-[6px] border-[0.5px] border-amber-700/18 pointer-events-none"></div>
+                                    <div class="overflow-hidden gallery-frame-inner">
+                                        <img src="d520c4389b5fae6e7a3b1d83b61f559f.jpg" alt="啦啦操获奖证书" class="w-[120px] h-[162px] object-cover group-hover:scale-[1.08] transition-all duration-[700ms] ease-out">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Col2 — 白框 | 竖版 | 非遗绒花 -->
+                            <div class="animate-fly-in gallery-item flex justify-center items-center" style="animation-delay: 0.17s; --rot: rotate(0.5deg);">
+                                <div class="bg-[#f7f3ed] shadow-[0_4px_20px_rgba(0,0,0,0.48)] p-[6px] relative group cursor-pointer transition-all duration-[600ms] hover:scale-[1.22] hover:z-50 hover:shadow-[0_14px_48px_rgba(0,0,0,0.72),0_0_26px_rgba(212,168,83,0.12)] hover:rotate-0">
+                                    <div class="absolute inset-[6px] border-[0.5px] border-amber-700/18 pointer-events-none"></div>
+                                    <div class="overflow-hidden gallery-frame-inner">
+                                        <img src="7142a08481068894d36de5887e235aa2.jpg" alt="非遗绒花" class="w-[120px] h-[162px] object-cover group-hover:scale-[1.08] transition-all duration-[700ms] ease-out">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ══════════ Divider 1 — 杂志专栏分隔线 ══════════ -->
+                        <div class="flex items-center justify-center gap-3 pointer-events-none w-full">
+                            <!-- 左侧版式参考线 -->
+                            <div class="flex-1 flex items-center">
+                                <div class="w-[2px] h-[14px] bg-white/[0.05] mr-2"></div>
+                                <div class="flex-1 h-[0.5px] bg-gradient-to-r from-amber-400/25 via-amber-300/15 to-transparent"></div>
+                            </div>
+                            <!-- 中央装饰组 -->
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-[3.5px] h-[3.5px] bg-amber-300/35 rotate-45"></div>
+                                <span class="text-amber-300/30 text-[7px] tracking-[0.35em] uppercase font-medium">Certificates</span>
+                                <div class="w-[3.5px] h-[3.5px] bg-amber-300/35 rotate-45"></div>
+                            </div>
+                            <!-- 右侧版式参考线 -->
+                            <div class="flex-1 flex items-center justify-end">
+                                <div class="flex-1 h-[0.5px] bg-gradient-to-l from-amber-400/25 via-amber-300/15 to-transparent"></div>
+                                <div class="w-[2px] h-[14px] bg-white/[0.05] ml-2"></div>
+                            </div>
+                        </div>
+
+                        <!-- ══════════ Row2 — 横版行：研学 + 帆软FCA ══════════ -->
+                        <div class="flex gap-x-4">
+                            <!-- Col1 — 深色框 | 横版 | 研学 -->
+                            <div class="animate-fly-in gallery-item dark-frame flex justify-center items-center" style="animation-delay: 0.26s; --rot: rotate(0.6deg);">
+                                <div class="bg-[#2c2823] shadow-[0_4px_20px_rgba(0,0,0,0.50)] p-[5px] relative group cursor-pointer transition-all duration-[600ms] hover:scale-[1.22] hover:z-50 hover:shadow-[0_14px_48px_rgba(0,0,0,0.76),0_0_22px_rgba(180,140,100,0.08)] hover:rotate-0">
+                                    <div class="absolute inset-[5px] border-[0.5px] border-stone-500/22 pointer-events-none"></div>
+                                    <div class="overflow-hidden gallery-frame-inner">
+                                        <img src="9d7c368679786b11a3a75878ed50b0a9 - 副本.jpg" alt="研学证书" class="w-[158px] h-[106px] object-cover group-hover:scale-[1.08] transition-all duration-[700ms] ease-out">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Col2 — 深色框 | 横版 | 帆软FCA -->
+                            <div class="animate-fly-in gallery-item dark-frame flex justify-center items-center" style="animation-delay: 0.35s; --rot: rotate(-0.4deg);">
+                                <div class="bg-[#2c2823] shadow-[0_4px_20px_rgba(0,0,0,0.50)] p-[5px] relative group cursor-pointer transition-all duration-[600ms] hover:scale-[1.22] hover:z-50 hover:shadow-[0_14px_48px_rgba(0,0,0,0.76),0_0_22px_rgba(180,140,100,0.08)] hover:rotate-0">
+                                    <div class="absolute inset-[5px] border-[0.5px] border-stone-500/22 pointer-events-none"></div>
+                                    <div class="overflow-hidden gallery-frame-inner">
+                                        <img src="50c66142107c23445b31d70d9476c16c.jpg" alt="帆软FCA证书" class="w-[158px] h-[106px] object-cover group-hover:scale-[1.08] transition-all duration-[700ms] ease-out">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ══════════ Divider 2 — 杂志页码/版次装饰 ══════════ -->
+                        <div class="flex items-center justify-center gap-4 pointer-events-none w-full">
+                            <!-- 左侧装饰 -->
+                            <div class="flex items-center gap-2">
+                                <div class="w-8 h-[0.5px] bg-white/6"></div>
+                                <div class="w-1 h-1 rounded-full bg-white/10"></div>
+                            </div>
+                            <!-- 中央页码元素 -->
+                            <div class="flex items-baseline gap-1.5">
+                                <span class="text-white/12 text-[6px] tracking-[0.4em] uppercase">No.</span>
+                                <span class="text-amber-300/22 text-[10px] font-semibold tracking-tight">03</span>
+                            </div>
+                            <!-- 中央细线 + 菱形 -->
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-5 h-[0.5px] bg-amber-400/12"></div>
+                                <div class="w-[4px] h-[4px] border-[0.5px] border-amber-300/20 rotate-45"></div>
+                                <div class="w-5 h-[0.5px] bg-amber-400/12"></div>
+                            </div>
+                            <!-- 标签 -->
+                            <span class="text-white/12 text-[6px] tracking-[0.4em] uppercase">Collection</span>
+                            <!-- 右侧装饰 -->
+                            <div class="flex items-center gap-2">
+                                <div class="w-1 h-1 rounded-full bg-white/10"></div>
+                                <div class="w-8 h-[0.5px] bg-white/6"></div>
+                            </div>
+                        </div>
+
+                        <!-- ══════════ Row3 — 横版行：Blackmagic + SEED设计 ══════════ -->
+                        <div class="flex gap-x-4">
+                            <!-- Col1 — 白框 | 横版 | Blackmagic -->
+                            <div class="animate-fly-in gallery-item flex justify-center items-center" style="animation-delay: 0.44s; --rot: rotate(0.4deg);">
+                                <div class="bg-[#f7f3ed] shadow-[0_4px_20px_rgba(0,0,0,0.48)] p-[5px] relative group cursor-pointer transition-all duration-[600ms] hover:scale-[1.22] hover:z-50 hover:shadow-[0_14px_48px_rgba(0,0,0,0.72),0_0_26px_rgba(212,168,83,0.12)] hover:rotate-0">
+                                    <div class="absolute inset-[5px] border-[0.5px] border-amber-700/18 pointer-events-none"></div>
+                                    <div class="overflow-hidden gallery-frame-inner">
+                                        <img src="a7e8dd0995edf62cf94351b8ea3117d7.jpg" alt="Blackmagic证书" class="w-[158px] h-[106px] object-cover group-hover:scale-[1.08] transition-all duration-[700ms] ease-out">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Col2 — 深色框 | 横版 | SEED设计 -->
+                            <div class="animate-fly-in gallery-item dark-frame flex justify-center items-center" style="animation-delay: 0.53s; --rot: rotate(0.5deg);">
+                                <div class="bg-[#2c2823] shadow-[0_4px_20px_rgba(0,0,0,0.50)] p-[5px] relative group cursor-pointer transition-all duration-[600ms] hover:scale-[1.22] hover:z-50 hover:shadow-[0_14px_48px_rgba(0,0,0,0.76),0_0_22px_rgba(180,140,100,0.08)] hover:rotate-0">
+                                    <div class="absolute inset-[5px] border-[0.5px] border-stone-500/22 pointer-events-none"></div>
+                                    <div class="overflow-hidden gallery-frame-inner">
+                                        <img src="9007ae5355164d80c3ccbe6749dba4a3.jpg" alt="SEED设计作品" class="w-[158px] h-[106px] object-cover group-hover:scale-[1.08] transition-all duration-[700ms] ease-out">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 板块4：联系我 — 杂志编辑内页风格 -->
+        <div class="page page-3 bg-[#f5f0eb]">
+            <div class="w-full h-full flex relative items-stretch">
+                <!-- 左侧：深色文字内容区 -->
+                <div class="w-[56%] h-full bg-[#f5f0eb] flex flex-col justify-start pl-20 pr-12 py-12 overflow-auto">
+                    <!-- 顶部导航标签 -->
+                    <div class="flex gap-8 text-[10px] tracking-[0.25em] uppercase text-blackMain/55 font-semibold mb-8">
+                        <span>Contact</span>
+                        <span>Reach Out</span>
+                        <span>Connect</span>
+                    </div>
+
+                    <!-- 章节编号 -->
+                    <div class="flex items-baseline gap-4 mb-4">
+                        <span class="text-5xl font-bold text-blackMain/85">04</span>
+                        <div class="w-8 h-[0.5px] bg-blackMain/25"></div>
+                        <span class="text-xs tracking-[0.3em] uppercase text-blackMain/60 font-bold">Get In Touch</span>
+                    </div>
+
+                    <!-- 主标题 -->
+                    <h2 class="text-[3.2vw] font-bold text-blackMain tracking-tight leading-none mb-3">COLLABORATE<br>WITH ME</h2>
+
+                    <!-- 引文装饰 -->
+                    <p class="text-sm text-blackMain/65 leading-relaxed mb-8 max-w-md font-semibold" style="font-style: italic;">
+                        "Every great project begins with a conversation. Let's create something extraordinary together."
+                    </p>
+
+                    <!-- 表单区域 — 杂志级细线风格 -->
+                    <form id="contact-form" class="space-y-7 max-w-lg flex-1 flex flex-col justify-start">
+                        <!-- 姓名 -->
+                        <div class="relative">
+                            <label class="text-[10px] tracking-[0.2em] uppercase text-blackMain/55 font-bold mb-2 block">Your Name</label>
+                            <input id="contact-name" name="name" type="text" placeholder="请输入您的姓名" required class="w-full bg-transparent border-b border-blackMain/15 pb-3 text-blackMain/80 text-sm outline-none placeholder:text-blackMain/20 transition-colors duration-300 focus:border-redTheme/50">
+                        </div>
+                        <!-- 邮箱 -->
+                        <div class="relative">
+                            <label class="text-[10px] tracking-[0.2em] uppercase text-blackMain/55 font-bold mb-2 block">Email Address</label>
+                            <input id="contact-email" name="email" type="email" placeholder="请输入您的邮箱" required class="w-full bg-transparent border-b border-blackMain/15 pb-3 text-blackMain/80 text-sm outline-none placeholder:text-blackMain/20 transition-colors duration-300 focus:border-redTheme/50">
+                        </div>
+                        <!-- 留言 -->
+                        <div class="relative">
+                            <label class="text-[10px] tracking-[0.2em] uppercase text-blackMain/55 font-bold mb-2 block">Your Message</label>
+                            <textarea id="contact-message" name="message" placeholder="在此写下您想说的话..." rows="3" required class="w-full bg-transparent border-b border-blackMain/15 pb-3 text-blackMain/80 text-sm outline-none resize-none placeholder:text-blackMain/20 transition-colors duration-300 focus:border-redTheme/50"></textarea>
+                        </div>
+                        <!-- 提交反馈提示 -->
+                        <div id="contact-feedback" class="text-xs font-semibold tracking-[0.1em] opacity-0 transition-opacity duration-300 h-4"></div>
+                        <!-- 提交按钮 — 描边风格 -->
+                        <button id="contact-submit-btn" type="submit" class="group flex items-center gap-3 text-blackMain/80 font-semibold text-sm tracking-[0.15em] uppercase transition-all duration-300 hover:text-redTheme cursor-pointer">
+                            <span id="contact-btn-text">Send Message</span>
+                            <div class="w-8 h-[0.5px] bg-blackMain/25 transition-all duration-300 group-hover:w-12 group-hover:bg-redTheme"></div>
+                            <span class="text-redTheme opacity-0 -translate-x-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0">→</span>
+                        </button>
+                    </form>
+
+                    <!-- 底部装饰信息 -->
+                    <div class="mt-auto pt-8 flex items-center gap-6 text-[10px] tracking-[0.15em] uppercase text-blackMain/40 font-semibold">
+                        <span>15888511679</span>
+                        <div class="w-[3px] h-[3px] bg-blackMain/15"></div>
+                        <span>207357972@qq.com</span>
+                        <div class="w-[3px] h-[3px] bg-blackMain/15"></div>
+                        <span>Zhejiang · Ningbo</span>
+                    </div>
+                </div>
+
+                <!-- 右侧：全高图片 -->
+                <div class="w-[44%] h-full bg-blackMain relative overflow-hidden">
+                    <img id="contact-image" src="5b4da057a1bfdde2e7488fcbe26ec4c5.jpg" alt="联系我照片" class="w-full h-full object-cover grayscale hover:grayscale-0 transition-all duration-700 contact-img-hidden">
+                    <!-- 图片上方渐变遮罩 -->
+                    <div class="absolute inset-0 pointer-events-none bg-gradient-to-t from-blackMain/20 via-transparent to-transparent"></div>
+                </div>
+
+                <!-- YHY 竖向大字装饰 - 在交界线 -->
+                <div class="absolute top-0 right-0 z-40 pointer-events-none text-blackMain/[0.04]" style="right: calc(44% - 0.5vw); height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 2vh;">
+                    <span class="text-[9vw] font-black leading-none select-none" style="font-family: sans-serif; writing-mode: vertical-rl; letter-spacing: -0.05em;">YHY</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const pages = document.querySelectorAll('.page');
+        const navItems = document.querySelectorAll('.nav-item');
+        const subNavItems = document.querySelectorAll('.sub-nav-item');
+        const practicePage = document.querySelector('.practice-page');
+        const practiceDetailPage = document.querySelector('.practice-detail-page');
+        const basicInfoPage = document.querySelector('.basic-info-page');
+        const dropdownMenu = document.querySelector('.nav-dropdown-menu');
+        const dropdownArrow = document.querySelector('.nav-dropdown-arrow');
+        const navMain = document.querySelector('.nav-main');
+        let dropdownOpen = false;
+        let currentIndex = 0;
+        const totalPage = pages.length;
+        let aboutSubIndex = 0;
+        let isAnimating = false;
+
+        pages.forEach((p, i) => {
+            if (i !== 0) p.style.display = 'none';
+        });
+
+        // 更新子导航高亮
+        function updateSubNavHighlight() {
+            subNavItems.forEach((item, i) => {
+                if (i === aboutSubIndex) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+            if (dropdownMenu) {
+                dropdownMenu.classList.remove('open');
+                dropdownArrow.classList.remove('open');
+                dropdownOpen = false;
+            }
+        }
+
+        function switchPage(idx) {
+            if (isAnimating) return;
+            if (idx === currentIndex) {
+                if (idx === 1) {
+                    aboutSubIndex = 0;
+                    if (basicInfoPage) basicInfoPage.classList.remove('hidden');
+                    if (practicePage) practicePage.classList.add('hidden');
+                    if (practiceDetailPage) practiceDetailPage.classList.add('hidden');
+                    updateSubNavHighlight();
+                }
+                return;
+            }
+
+            isAnimating = true;
+            const oldPageEl = pages[currentIndex];
+            const newPageEl = pages[idx];
+
+            const flipWrapper = document.createElement('div');
+            flipWrapper.className = 'flip-wrapper';
+
+            const pageSheet = document.createElement('div');
+            pageSheet.className = 'flip-page-sheet';
+            const oldContentClone = oldPageEl.cloneNode(true);
+            oldContentClone.removeAttribute('style');
+            oldContentClone.style.cssText = 'position:relative;width:100%;height:100%;transform:none;backface-visibility:hidden;';
+            pageSheet.appendChild(oldContentClone);
+
+            const shadowLayer = document.createElement('div');
+            shadowLayer.className = 'flip-shadow';
+            shadowLayer.innerHTML = '<div style="position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(to left, rgba(0,0,0,0.35), rgba(0,0,0,0.08) 30%, transparent 70%);border-radius:0;"></div>';
+
+            flipWrapper.appendChild(pageSheet);
+            flipWrapper.appendChild(shadowLayer);
+
+            const container = document.querySelector('.page-container');
+            container.appendChild(flipWrapper);
+
+            oldPageEl.style.display = 'none';
+            newPageEl.style.display = 'block';
+            newPageEl.classList.add('animate-page-in');
+
+            requestAnimationFrame(() => {
+                pageSheet.classList.add('animate-page-out');
+                shadowLayer.classList.add('animate-page-out');
+
+                setTimeout(() => {
+                    flipWrapper.remove();
+                    newPageEl.classList.remove('animate-page-in');
+                    
+                    const oldIndex = currentIndex;
+                    currentIndex = idx;
+                    isAnimating = false;
+
+                    oldPageEl.removeAttribute('style');
+                    oldPageEl.style.display = 'none';
+                    newPageEl.style.display = 'block';
+
+                    pages.forEach((p, i) => {
+                        if (i !== idx) p.style.display = 'none';
+                    });
+                    newPageEl.style.display = 'block';
+
+                    if (idx === 1) {
+                        const anyVisible = (basicInfoPage && !basicInfoPage.classList.contains('hidden')) ||
+                                           (practicePage && !practicePage.classList.contains('hidden')) ||
+                                           (practiceDetailPage && !practiceDetailPage.classList.contains('hidden'));
+                        if (!anyVisible) {
+                            // from sub-nav, don't interfere
+                        } else if (aboutSubIndex === 0) {
+                            basicInfoPage.classList.remove('hidden');
+                            practicePage.classList.add('hidden');
+                            practiceDetailPage.classList.add('hidden');
+                        }
+                        updateSubNavHighlight();
+                    }
+
+                    if (idx === 3) {
+                        const contactImg = document.getElementById('contact-image');
+                        if (contactImg) {
+                            requestAnimationFrame(() => {
+                                contactImg.classList.add('contact-img-visible');
+                            });
+                        }
+                    } else {
+                        const contactImg = document.getElementById('contact-image');
+                        if (contactImg) {
+                            contactImg.classList.remove('contact-img-visible');
+                        }
+                    }
+
+                    updateNavColors(idx);
+                }, 950);
+            });
+        }
+
+        // 根据当前页面更新导航外观
+        function updateNavColors(pageIdx) {
+            const isDark = pageIdx === 0;
+            
+            // 导航栏背景
+            if (navMain) {
+                navMain.classList.toggle('light-bg', !isDark);
+            }
+
+            // 导航链接 — 使用 CSS class 控制，不写 inline style
+            const allNavLinks = document.querySelectorAll('.nav-link');
+            allNavLinks.forEach(link => {
+                link.style.color = ''; // 清除 inline，让 CSS class 接管
+                const idx = parseInt(link.dataset.index);
+                link.classList.toggle('active', idx === pageIdx);
+            });
+        }
+
+        function showAboutSubPage() {
+            const page1 = document.querySelector('.page-1');
+            if (!page1) { updateSubNavHighlight(); return; }
+            
+            const targetMap = { 0: basicInfoPage, 1: practicePage, 2: practiceDetailPage };
+            const targetPage = targetMap[aboutSubIndex];
+            if (!targetPage) { updateSubNavHighlight(); return; }
+
+            const allSubs = [basicInfoPage, practicePage, practiceDetailPage].filter(Boolean);
+            const currentSub = allSubs.find(s => !s.classList.contains('hidden'));
+            
+            if (currentSub === targetPage) { updateSubNavHighlight(); return; }
+
+            const COLS = 6, ROWS = 5;
+            const pw = page1.offsetWidth / COLS;
+            const ph = page1.offsetHeight / ROWS;
+
+            if (currentSub) {
+                const puzzleContainer = document.createElement('div');
+                puzzleContainer.style.cssText = 'position:absolute;inset:0;z-index:100;pointer-events:none;';
+                page1.appendChild(puzzleContainer);
+
+                for (let row = 0; row < ROWS; row++) {
+                    for (let col = 0; col < COLS; col++) {
+                        const piece = document.createElement('div');
+                        piece.className = 'puzzle-piece';
+                        piece.style.cssText = `
+                            left:${col * pw}px; top:${row * ph}px;
+                            width:${pw}px; height:${ph}px;
+                        `;
+                        const inner = document.createElement('div');
+                        inner.className = 'puzzle-inner';
+                        inner.innerHTML = currentSub.cloneNode(true).outerHTML;
+                        inner.style.transform = `translate(${-col * pw}px, ${-row * ph}px)`;
+                        piece.appendChild(inner);
+
+                        const px = (Math.random() - 0.5) * page1.offsetWidth * 1.2;
+                        const py = (Math.random() - 0.5) * page1.offsetHeight * 1.2;
+                        const r = (Math.random() - 0.5) * 60;
+                        piece.style.setProperty('--px', px + 'px');
+                        piece.style.setProperty('--py', py + 'px');
+                        piece.style.setProperty('--r', r + 'deg');
+
+                        puzzleContainer.appendChild(piece);
+                        piece.style.animation = `puzzleScatterOut 0.45s cubic-bezier(0.4, 0, 0.2, 1) forwards`;
+                        piece.style.animationDelay = `${(row * COLS + col) * 0.01}s`;
+                    }
+                }
+
+                currentSub.classList.add('hidden');
+                targetPage.classList.remove('hidden');
+                updateSubNavHighlight();
+
+                setTimeout(() => {
+                    puzzleContainer.remove();
+                }, 450 + COLS * ROWS * 0.01 + 100);
+            } else {
+                targetPage.classList.remove('hidden');
+                if (basicInfoPage && basicInfoPage !== targetPage) basicInfoPage.classList.add('hidden');
+                if (practicePage && practicePage !== targetPage) practicePage.classList.add('hidden');
+                if (practiceDetailPage && practiceDetailPage !== targetPage) practiceDetailPage.classList.add('hidden');
+                updateSubNavHighlight();
+            }
+        }
+
+        // ===== 下拉菜单 JS 控制 =====
+        // 点击 About 导航项 — 切换下拉菜单
+        const aboutNavItem = document.querySelector('[data-index="1"].nav-link');
+        if (aboutNavItem) {
+            aboutNavItem.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (dropdownOpen) {
+                    closeDropdown();
+                } else {
+                    openDropdown();
+                }
+            });
+        }
+        
+        function openDropdown() {
+            if (dropdownMenu) {
+                dropdownMenu.classList.add('open');
+                dropdownArrow.classList.add('open');
+                dropdownOpen = true;
+            }
+        }
+        function closeDropdown() {
+            if (dropdownMenu) {
+                dropdownMenu.classList.remove('open');
+                dropdownArrow.classList.remove('open');
+                dropdownOpen = false;
+            }
+        }
+        
+        // 点击页面其他地方关闭下拉
+        document.addEventListener('click', (e) => {
+            if (dropdownOpen && !e.target.closest('.nav-dropdown-group')) {
+                closeDropdown();
+            }
+        });
+
+        navItems.forEach(nav => {
+            nav.addEventListener('click', (e) => {
+                // 如果是 About 项（data-index=1），下拉菜单逻辑已在上面处理
+                if (Number(nav.dataset.index) === 1) return;
+                const idx = Number(nav.dataset.index);
+                closeDropdown();
+                switchPage(idx);
+            });
+        });
+
+        subNavItems.forEach(subNav => {
+            subNav.addEventListener('click', (e) => {
+                e.stopPropagation();
+                closeDropdown();
+                const subIdx = Number(subNav.dataset.sub);
+                
+                if (currentIndex !== 1) {
+                    if (basicInfoPage) basicInfoPage.classList.add('hidden');
+                    if (practicePage) practicePage.classList.add('hidden');
+                    if (practiceDetailPage) practiceDetailPage.classList.add('hidden');
+                    aboutSubIndex = subIdx;
+                    updateSubNavHighlight();
+                    switchPage(1);
+                    setTimeout(() => {
+                        aboutSubIndex = subIdx;
+                        showAboutSubPage();
+                    }, 1125);
+                } else {
+                    aboutSubIndex = subIdx;
+                    showAboutSubPage();
+                }
+            });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (currentIndex === 1) {
+                if (e.key === 'ArrowDown') {
+                    aboutSubIndex = (aboutSubIndex + 1) % 3;
+                    showAboutSubPage();
+                    return;
+                }
+                if (e.key === 'ArrowUp') {
+                    aboutSubIndex = (aboutSubIndex - 1 + 3) % 3;
+                    showAboutSubPage();
+                    return;
+                }
+            }
+
+            if (e.key === 'ArrowRight') {
+                let next = currentIndex + 1;
+                if (next >= totalPage) next = 0;
+                switchPage(next);
+            }
+            if (e.key === 'ArrowLeft') {
+                let prev = currentIndex - 1;
+                if (prev < 0) prev = totalPage - 1;
+                switchPage(prev);
+            }
+        });
+
+        // ========== 云雾鼠标拖影效果 ==========
+        const cloudCanvas = document.createElement('canvas');
+        cloudCanvas.style.cssText = 'position:fixed;top:0;left:0;pointer-events:none;z-index:9997;mix-blend-mode:screen;';
+        document.body.appendChild(cloudCanvas);
+
+        const ctx = cloudCanvas.getContext('2d');
+        let canvasW, canvasH;
+
+        function resizeCanvas() {
+            canvasW = cloudCanvas.width = window.innerWidth;
+            canvasH = cloudCanvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        const cloudParticles = [];
+        const MAX_PARTICLES = 60;
+        let mouseX = -200, mouseY = -200;
+        let prevX = -200, prevY = -200;
+        let mouseMoving = false;
+        let moveTimeout;
+
+        document.addEventListener('mousemove', (e) => {
+            prevX = mouseX;
+            prevY = mouseY;
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            mouseMoving = true;
+            clearTimeout(moveTimeout);
+            moveTimeout = setTimeout(() => { mouseMoving = false; }, 150);
+
+            const dx = mouseX - prevX;
+            const dy = mouseY - prevY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            const steps = Math.max(1, Math.floor(dist / 8));
+
+            for (let s = 0; s < steps; s++) {
+                if (cloudParticles.length >= MAX_PARTICLES) {
+                    cloudParticles.shift();
+                }
+                const t = s / steps;
+                cloudParticles.push({
+                    x: prevX + dx * t + (Math.random() - 0.5) * 14,
+                    y: prevY + dy * t + (Math.random() - 0.5) * 14,
+                    radius: 12 + Math.random() * 28,
+                    life: 1,
+                    decay: 0.012 + Math.random() * 0.024,
+                    vx: (Math.random() - 0.5) * 1.2,
+                    vy: (Math.random() - 0.5) * 1.2 - 0.3
+                });
+            }
+        });
+
+        function idleParticles() {
+            if (!mouseMoving && mouseX > 0 && mouseY > 0 && cloudParticles.length < MAX_PARTICLES) {
+                cloudParticles.push({
+                    x: mouseX + (Math.random() - 0.5) * 50,
+                    y: mouseY + (Math.random() - 0.5) * 50,
+                    radius: 6 + Math.random() * 16,
+                    life: 1,
+                    decay: 0.018 + Math.random() * 0.03,
+                    vx: (Math.random() - 0.5) * 0.6,
+                    vy: (Math.random() - 0.5) * 0.6 - 0.6
+                });
+            }
+        }
+
+        function animateCloud() {
+            ctx.clearRect(0, 0, canvasW, canvasH);
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.04)';
+            ctx.fillRect(0, 0, canvasW, canvasH);
+
+            for (let i = cloudParticles.length - 1; i >= 0; i--) {
+                const p = cloudParticles[i];
+                const gradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.radius);
+                gradient.addColorStop(0, `rgba(255, 85, 70, ${p.life * 0.55})`);
+                gradient.addColorStop(0.35, `rgba(255, 85, 70, ${p.life * 0.3})`);
+                gradient.addColorStop(0.7, `rgba(255, 85, 70, ${p.life * 0.08})`);
+                gradient.addColorStop(1, `rgba(255, 85, 70, 0)`);
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fillStyle = gradient;
+                ctx.fill();
+
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life -= p.decay;
+                p.radius += 0.35;
+
+                if (p.life <= 0) {
+                    cloudParticles.splice(i, 1);
+                }
+            }
+
+            idleParticles();
+            requestAnimationFrame(animateCloud);
+        }
+
+        const cursorDot = document.querySelector('.cursor-dot');
+        if (cursorDot) cursorDot.style.display = 'none';
+
+        animateCloud();
+
+        // 初始化导航栏颜色
+        updateNavColors(0);
+
+        // ========== 联系我表单提交 ==========
+        const contactForm = document.getElementById('contact-form');
+        const contactFeedback = document.getElementById('contact-feedback');
+        const contactBtnText = document.getElementById('contact-btn-text');
+        const contactSubmitBtn = document.getElementById('contact-submit-btn');
+
+        contactForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('contact-name').value.trim();
+            const email = document.getElementById('contact-email').value.trim();
+            const message = document.getElementById('contact-message').value.trim();
+
+            // 邮箱格式校验
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                contactFeedback.textContent = '请输入有效的邮箱地址';
+                contactFeedback.className = 'text-xs font-semibold tracking-[0.1em] opacity-100 transition-opacity duration-300 text-redTheme h-4';
+                return;
+            }
+
+            if (message.length < 2) {
+                contactFeedback.textContent = '留言内容不能为空';
+                contactFeedback.className = 'text-xs font-semibold tracking-[0.1em] opacity-100 transition-opacity duration-300 text-redTheme h-4';
+                return;
+            }
+
+            // 禁用按钮，显示加载状态
+            contactSubmitBtn.disabled = true;
+            contactBtnText.textContent = 'Sending...';
+            contactFeedback.textContent = '';
+            contactFeedback.className = 'text-xs font-semibold tracking-[0.1em] opacity-100 transition-opacity duration-300 text-blackMain/50 h-4';
+
+            try {
+                // 模拟提交延迟
+                await new Promise(resolve => setTimeout(resolve, 1200));
+
+                contactFeedback.textContent = '消息已成功发送，感谢您的联系！';
+                contactFeedback.className = 'text-xs font-semibold tracking-[0.1em] opacity-100 transition-opacity duration-300 text-green-600 h-4';
+                contactBtnText.textContent = 'Sent ✓';
+
+                // 3秒后重置表单
+                setTimeout(() => {
+                    contactForm.reset();
+                    contactBtnText.textContent = 'Send Message';
+                    contactSubmitBtn.disabled = false;
+                    contactFeedback.className = 'text-xs font-semibold tracking-[0.1em] opacity-0 transition-opacity duration-300 h-4';
+                }, 3000);
+
+            } catch (err) {
+                contactFeedback.textContent = '发送失败，请稍后重试';
+                contactFeedback.className = 'text-xs font-semibold tracking-[0.1em] opacity-100 transition-opacity duration-300 text-redTheme h-4';
+                contactBtnText.textContent = 'Send Message';
+                contactSubmitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
