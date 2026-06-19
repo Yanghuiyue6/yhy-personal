@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
@@ -359,6 +359,196 @@
         /* 杂志统一图片色调 — 微暖、微对比、低饱和 */
         .img-magazine {
             filter: sepia(5%) contrast(1.04) brightness(0.96) saturate(0.92);
+        }
+
+        /* ═══════════════ 响应式设计 — 平板端 ═══════════════ */
+        @media (max-width: 1024px) {
+            .page-container {
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+            .page {
+                min-height: 100vh;
+                height: auto;
+                overflow-y: auto;
+                position: relative;
+            }
+        }
+
+        /* ═══════════════ 响应式设计 — 手机端 ═══════════════ */
+        @media (max-width: 768px) {
+            /* ===== 全局 ===== */
+            body { overflow-y: auto; overflow-x: hidden; }
+            .page-container {
+                overflow-y: auto;
+                overflow-x: hidden;
+                perspective: none;
+                height: auto;
+            }
+            .page {
+                position: relative;
+                height: auto;
+                min-height: 100vh;
+                overflow-y: auto;
+                transform: none !important;
+                clip-path: none !important;
+            }
+            .page-active { z-index: 1; }
+
+            /* 翻书动画在移动端简化为淡入淡出 */
+            .flip-wrapper { display: none !important; }
+            @keyframes mobileFadeIn {
+                from { opacity: 0; transform: translateY(20px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            .animate-page-in {
+                animation: mobileFadeIn 0.5s ease-out forwards !important;
+            }
+            .animate-page-out { animation: none !important; }
+
+            /* ===== 导航栏 ===== */
+            nav.nav-main {
+                padding: 12px 16px !important;
+                background: rgba(0,0,0,0.85) !important;
+                backdrop-filter: blur(12px);
+                -webkit-backdrop-filter: blur(12px);
+                pointer-events: auto !important;
+                flex-wrap: nowrap;
+            }
+            nav.nav-main .nav-brand-text { font-size: 14px !important; color: #fff !important; text-shadow: none !important; }
+            nav.nav-main .nav-brand-sub { font-size: 8px !important; color: rgba(255,255,255,0.5) !important; text-shadow: none !important; }
+            nav.nav-main .nav-brand-divider { background: rgba(255,255,255,0.2) !important; }
+            nav.nav-main.light-bg {
+                background: rgba(255,255,255,0.95) !important;
+                backdrop-filter: blur(12px);
+            }
+            nav.nav-main.light-bg .nav-brand-text { color: #111 !important; }
+            nav.nav-main.light-bg .nav-brand-sub { color: rgba(0,0,0,0.45) !important; }
+            nav.nav-main.light-bg .nav-brand-divider { background: rgba(0,0,0,0.15) !important; }
+            nav.nav-main.light-bg .nav-link { color: #111 !important; text-shadow: none !important; }
+
+            .nav-main .flex.items-center.gap-10 {
+                gap: 16px !important;
+            }
+            .nav-link {
+                font-size: 12px !important;
+                color: #fff !important;
+                text-shadow: none !important;
+                padding-bottom: 4px !important;
+            }
+            .nav-dropdown-menu {
+                right: 0 !important;
+                min-width: 140px !important;
+                border-radius: 8px !important;
+            }
+            .sub-nav-item {
+                font-size: 12px !important;
+                padding: 10px 16px !important;
+            }
+
+            /* 隐藏鼠标拖影效果（移动端无鼠标） */
+            .cursor-dot, canvas[style*="z-index:9997"] { display: none !important; }
+
+            /* ===== 首页 ===== */
+            .page-0 { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+            .page-0 img { object-fit: cover !important; }
+            .page-0 .absolute.inset-0 span[style*="font-size: 7vw"] {
+                font-size: 9vw !important;
+            }
+            .page-0 .absolute.inset-0 span[style*="font-size: 16vw"] {
+                font-size: 20vw !important;
+            }
+            .page-0 .absolute.inset-0 span[style*="font-size: 1.2vw"] {
+                font-size: 3.2vw !important;
+            }
+
+            /* ===== About - 基本信息（左图右文 → 上下堆叠） ===== */
+            .basic-info-page { flex-direction: column !important; }
+            .basic-info-page > .w-\[48\%\] { width: 100% !important; height: 50vh !important; }
+            .basic-info-page > .w-\[52\%\] { width: 100% !important; min-height: auto !important; padding: 28px 20px !important; }
+            .basic-info-page .absolute.right-6 span[style*="font-size: 8vw"],
+            .basic-info-page .absolute.right-0 span[style*="font-size: 8vw"] {
+                font-size: 14vw !important;
+                top: 8% !important;
+                right: 12px !important;
+            }
+            .basic-info-page .grid { gap: 12px 16px !important; max-width: 100% !important; }
+            .basic-info-page .text-whiteMain.text-\[3vw\] { font-size: 6vw !important; }
+            .basic-info-page .absolute.right-2 { display: none !important; }
+            .basic-info-page .absolute.left-8 .text-5xl { font-size: 28px !important; }
+            .basic-info-page .absolute.left-8 .text-2xl { font-size: 16px !important; }
+            .basic-info-page .absolute.inset-0.flex.items-center span {
+                font-size: 10vw !important;
+                margin-left: 16px !important;
+            }
+
+            /* ===== About - 教育技能（左文右图 → 上下堆叠） ===== */
+            .practice-page { overflow-y: auto !important; }
+            .practice-page > .w-full.h-full.flex { flex-direction: column !important; }
+            .practice-page > .w-full.h-full.flex > .w-\[45\%\] { width: 100% !important; padding: 24px 20px 16px !important; flex: none !important; }
+            .practice-page > .w-full.h-full.flex > .w-\[55\%\] { width: 100% !important; height: 60vh !important; position: relative !important; }
+            .practice-page .text-lg { font-size: 15px !important; }
+            .practice-page .text-sm { font-size: 13px !important; }
+            .practice-page .text-base { font-size: 14px !important; }
+            /* 图片组缩放 */
+            .practice-page .absolute.top-\[6\%\].left-\[4\%\] { width: 48% !important; height: 45% !important; }
+            .practice-page .absolute.top-\[36\%\].left-\[28\%\] { width: 50% !important; height: 40% !important; left: 38% !important; }
+            .practice-page .text-\[8\.5vw\] { font-size: 14vw !important; }
+            .practice-page .text-\[12vw\] { font-size: 18vw !important; }
+
+            /* ===== About - 实践经历（左文右图 → 上下堆叠） ===== */
+            .practice-detail-page { overflow-y: auto !important; }
+            .practice-detail-page > .w-full.h-full.flex { flex-direction: column !important; }
+            .practice-detail-page > .w-full.h-full.flex > .w-\[45\%\] { width: 100% !important; padding: 24px 20px 16px !important; flex: none !important; }
+            .practice-detail-page > .w-full.h-full.flex > .w-\[55\%\] { width: 100% !important; height: auto !important; min-height: 55vh !important; padding: 16px !important; }
+            .practice-detail-page .grid { gap: 8px 12px !important; }
+            .practice-detail-page .text-\[14vw\] { font-size: 20vw !important; }
+
+            /* ===== Honors 荣誉证书（左文右图 → 上下堆叠） ===== */
+            .page-2 { overflow-y: auto !important; }
+            .page-2 > .w-full.px-10.pt-5 { padding: 12px 16px 0 !important; }
+            .page-2 > .w-full.h-full.flex { flex-direction: column !important; }
+            .page-2 > .w-full.h-full.flex > .w-\[48\%\] { width: 100% !important; padding: 20px 16px !important; flex: none !important; }
+            .page-2 > .w-full.h-full.flex > .w-\[52\%\] { width: 100% !important; height: auto !important; min-height: 70vh !important; padding: 24px 12px !important; }
+            .page-2 .text-4xl { font-size: 24px !important; }
+            .page-2 .text-3xl { font-size: 20px !important; }
+            .page-2 .grid { gap: 6px 12px !important; }
+            .page-2 .text-base { font-size: 13px !important; }
+
+            /* 画廊证书缩放 */
+            .page-2 .w-\[120px\] { width: 90px !important; }
+            .page-2 .h-\[162px\] { height: 122px !important; }
+            .page-2 .w-\[158px\] { width: 120px !important; }
+            .page-2 .h-\[106px\] { height: 80px !important; }
+            .page-2 .gap-x-4 { gap: 8px !important; }
+            .page-2 .gap-y-\[20px\] { gap: 12px !important; }
+            .page-2 .flex-1.flex.items-center { }
+            /* 分隔线内文字缩小 */
+            .page-2 .text-\[7px\] { font-size: 6px !important; }
+            .page-2 .text-\[6px\] { font-size: 5px !important; }
+            .page-2 .text-\[10px\] { font-size: 8px !important; }
+
+            /* ===== Contact 联系我（左文右图 → 上下堆叠） ===== */
+            .page-3 { overflow-y: auto !important; }
+            .page-3 > .w-full.h-full.flex { flex-direction: column-reverse !important; }
+            .page-3 > .w-full.h-full.flex > .w-\[56\%\] { width: 100% !important; padding: 24px 20px !important; flex: none !important; }
+            .page-3 > .w-full.h-full.flex > .w-\[44\%\] { width: 100% !important; height: 45vh !important; flex: none !important; }
+            .page-3 .text-\[3\.2vw\] { font-size: 7vw !important; }
+            .page-3 .text-5xl { font-size: 28px !important; }
+            .page-3 .max-w-md { max-width: 100% !important; }
+            .page-3 .mt-auto.pt-8 { flex-wrap: wrap !important; gap: 8px !important; font-size: 9px !important; padding-top: 24px !important; }
+            /* YHY 大字装饰在移动端缩小 */
+            .page-3 .absolute.top-0.right-0 span[style*="font-size: 9vw"],
+            .page-3 .absolute.top-0 span[style*="font-size: 9vw"] {
+                font-size: 14vw !important;
+                right: 2% !important;
+            }
+
+            /* 表单 */
+            #contact-form .space-y-7 { gap: 16px !important; }
+
+            /* 禁用hover效果的grayscale在移动端（触摸体验不好） */
+            .group-hover\\:grayscale-0 { }
         }
     </style>
 </head>
@@ -1005,6 +1195,10 @@
             }
         }
 
+        function isMobile() {
+            return window.innerWidth <= 768;
+        }
+
         function switchPage(idx) {
             if (isAnimating) return;
             if (idx === currentIndex) {
@@ -1018,6 +1212,69 @@
                 return;
             }
 
+            // 移动端简化切换（淡入淡出，无翻书动画）
+            if (isMobile()) {
+                const oldPageEl = pages[currentIndex];
+                const newPageEl = pages[idx];
+
+                newPageEl.style.display = 'block';
+                newPageEl.style.opacity = '0';
+                newPageEl.style.transform = 'translateY(20px)';
+                newPageEl.style.transition = 'opacity 0.4s ease-out, transform 0.4s ease-out';
+
+                oldPageEl.style.opacity = '1';
+                oldPageEl.style.transition = 'opacity 0.3s ease-out';
+
+                requestAnimationFrame(() => {
+                    oldPageEl.style.opacity = '0';
+                    newPageEl.style.opacity = '1';
+                    newPageEl.style.transform = 'translateY(0)';
+                });
+
+                setTimeout(() => {
+                    oldPageEl.style.display = 'none';
+                    oldPageEl.style.opacity = '';
+                    oldPageEl.style.transition = '';
+                    newPageEl.style.transition = '';
+                    currentIndex = idx;
+
+                    pages.forEach((p, i) => {
+                        if (i !== idx) {
+                            p.style.display = 'none';
+                            p.style.opacity = '';
+                        }
+                    });
+
+                    if (idx === 1) {
+                        if (basicInfoPage) basicInfoPage.classList.remove('hidden');
+                        if (practicePage) practicePage.classList.add('hidden');
+                        if (practiceDetailPage) practiceDetailPage.classList.add('hidden');
+                        aboutSubIndex = 0;
+                        updateSubNavHighlight();
+                    }
+
+                    if (idx === 3) {
+                        const contactImg = document.getElementById('contact-image');
+                        if (contactImg) {
+                            requestAnimationFrame(() => {
+                                contactImg.classList.add('contact-img-visible');
+                            });
+                        }
+                    } else {
+                        const contactImg = document.getElementById('contact-image');
+                        if (contactImg) {
+                            contactImg.classList.remove('contact-img-visible');
+                        }
+                    }
+
+                    updateNavColors(idx);
+                    // 滚动到顶部
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 400);
+                return;
+            }
+
+            // 桌面端翻书动画
             isAnimating = true;
             const oldPageEl = pages[currentIndex];
             const newPageEl = pages[idx];
@@ -1106,7 +1363,12 @@
             
             // 导航栏背景
             if (navMain) {
-                navMain.classList.toggle('light-bg', !isDark);
+                if (isMobile()) {
+                    // 移动端始终有背景，由CSS控制
+                    navMain.classList.toggle('light-bg', !isDark);
+                } else {
+                    navMain.classList.toggle('light-bg', !isDark);
+                }
             }
 
             // 导航链接 — 使用 CSS class 控制，不写 inline style
@@ -1117,6 +1379,18 @@
                 link.classList.toggle('active', idx === pageIdx);
             });
         }
+
+        // 初始化移动端的页面导航
+        function initMobilePages() {
+            if (isMobile()) {
+                document.body.style.overflow = 'auto';
+                document.querySelector('.page-container').style.overflow = 'visible';
+            } else {
+                document.body.style.overflow = 'hidden';
+            }
+        }
+        initMobilePages();
+        window.addEventListener('resize', initMobilePages);
 
         function showAboutSubPage() {
             const page1 = document.querySelector('.page-1');
